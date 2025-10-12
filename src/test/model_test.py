@@ -1,5 +1,5 @@
 from ..model.model import Transformer
-from ..utils.tokenizer import tokenizer, text_to_token_ids
+from ..utils.tokenizer import tokenizer
 import torch
 
 # --- Configuração do Treinamento ---
