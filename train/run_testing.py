@@ -1,4 +1,3 @@
-from src import GPT2ModelGQA, GPT2ModelMHA
 from src import get_loaders
 from src import generate_text
 from src import text_to_token_ids, token_ids_to_text, tokenizer

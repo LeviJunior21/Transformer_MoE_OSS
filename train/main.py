@@ -1,6 +1,6 @@
 import torch, time
 from ..src.utils.tokenizer import tokenizer
-from ..src.model.model import GPT2ModelGQA
+from ..src.model.model import Transformer
 from .train import train_model
 from ..src.utils.loaders import get_loaders
 from ..src.utils.data import get_data
@@ -39,7 +39,7 @@ train_loader, test_loader, val_loader = get_loaders(
 )
 
 
-model = GPT2ModelGQA(config, device).to(device=device)
+model = Transformer(config, device).to(device=device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=config["learning_rate"], weight_decay=config["weight_decay"])
 model.train()
 
