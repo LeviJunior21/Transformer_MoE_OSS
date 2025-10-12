@@ -27,6 +27,7 @@ config = {
     "device": torch.device("cuda" if torch.cuda.is_available() else "cpu"),
 }
 
+torch.manual_seed(123)
 tokenizer = tiktoken.get_encoding("o200k_base")
 text_encoded = tokenizer.encode(config["start_context"])
 text_encoded_tensor = torch.tensor(text_encoded, device=config["device"]).unsqueeze(0)
@@ -37,3 +38,5 @@ result_encoded = generate_text(idx=text_encoded_tensor, model=model_test, max_ne
 result_encoded_list = result_encoded.squeeze(0).tolist()
 result = tokenizer.decode(result_encoded_list)
 print(result)
+
+assert result == "Se o jardim spotting classifier Gemeადი hiểm يجوز Faça studenten glossary.sa"
