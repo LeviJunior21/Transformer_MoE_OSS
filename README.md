@@ -8,7 +8,7 @@ deeplearning-final/
 ├── notebooks/              # Notebooks de experimentação e visualização
 ├── scripts/                # Scripts de ingestão e pré-processamento
 ├── src/
-│   ├── gpt_2/              # Arquitetura customizada do modelo
+│   ├── model/              # Arquitetura customizada do modelo
 │   └── utils/              # Funções auxiliares
 ├── train/                  # Loop de treinamento e avaliação
 ├── data/                   # Corpus limpo e dividido
