@@ -111,7 +111,7 @@ def get_pt_books():
             print(f"Erro em {url_livro}: {e}")
 
     print(f"Todos os livros disponíveis foram baixados com sucesso: {successful}")
-    print(f"Tamanho total baixado: {total_downloaded / 1024 / 1024:.2f} MB")
+    print(f"Tamanho total geral baixado: {total_downloaded / 1024 / 1024:.2f} MB")
 
 
 if __name__ == "__main__":
