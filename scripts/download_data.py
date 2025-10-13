@@ -62,7 +62,7 @@ def download_files():
     total_bytes_downloaded = 0
 
     for filename, url in BOOKS.items():
-        output_path = os.path.join(OUTPUT_DIR, filename)
+        output_path = os.path.join(OUTPUT_DIR, f"livro_{filename}.txt")
         
         try:
             response = requests.get(url, stream=True)
