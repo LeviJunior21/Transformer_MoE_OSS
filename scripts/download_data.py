@@ -31,7 +31,6 @@ for h2, ul in zip(headers, uls):
             a = li.find_element(By.TAG_NAME, "a")
             codigo = a.get_attribute('href').split("/")[-1]
             link = f"https://www.gutenberg.org/files/{codigo}"
-            print(f"📄 {link}")
             livros.append(link)
 
 i = 0
@@ -47,7 +46,7 @@ for livro in livros:
             href = a.get_attribute("href")
             if text.endswith(".txt") or (href and href.endswith(".txt")):
                 BOOKS[str(i)] = href
-                print(f"📄Baixando {href}")
+                print(f"📄Livro encontrado em texto: {href}")
                 i += 1
                 break
     except Exception as e:
