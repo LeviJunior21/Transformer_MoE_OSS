@@ -19,5 +19,5 @@ pandas
 wandb
 
 # Raspagem dos dados
-selenium==4.10.0
+selenium
 webdriver-manager
