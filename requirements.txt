@@ -14,3 +14,6 @@ scikit-learn
 
 #pandas
 pandas
+
+#Wandb: Weights & Biases
+wandb
