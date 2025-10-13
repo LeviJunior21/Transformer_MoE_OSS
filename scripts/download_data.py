@@ -87,7 +87,6 @@ def get_pt_books():
 
     total_downloaded = 0
     successful = 0
-    count = 0
 
     for link in base_links:
         codigo = link.split("/")[-1]
@@ -110,8 +109,6 @@ def get_pt_books():
                     break
         except Exception as e:
             print(f"Erro em {url_livro}: {e}")
-
-        count += 1
 
     print(f"Total de livros baixados com sucesso: {successful}")
     print(f"Tamanho total baixado: {total_downloaded / 1024 / 1024:.2f} MB")
