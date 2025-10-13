@@ -52,7 +52,6 @@ def download_file(url, filename, total_downloaded):
                 progress_bar.update(len(chunk))
 
         progress_bar.close()
-        print(f"Livro de código ´{filename}´ baixado ({downloaded / 1024 / 1024:.2f} MB)")
         return total_downloaded, False, True
 
     except requests.exceptions.RequestException as e:
