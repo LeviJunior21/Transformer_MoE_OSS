@@ -17,3 +17,7 @@ pandas
 
 #Wandb: Weights & Biases
 wandb
+
+# Raspagem dos dados
+selenium
+webdriver-manager
