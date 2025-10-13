@@ -1,13 +1,19 @@
 import os
+import sys
+import time
+import random
 import requests
 from tqdm import tqdm
-
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
-import time
+
+
+MAX_MB = int(sys.argv[1]) if len(sys.argv) > 1 else None
+MAX_BYTES = MAX_MB * 1024 * 1024 if MAX_MB else float('inf')
+OUTPUT_DIR = "data/raw"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+print(f"Limite definido: {MAX_MB} MB\n")
 
 
 chrome_options = Options()
@@ -16,87 +22,95 @@ chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 driver = webdriver.Chrome(options=chrome_options)
 
-url = "https://www.gutenberg.org/browse/languages/pt"
-driver.get(url)
 
-divs = driver.find_element(By.CLASS_NAME, "pgdbbylanguage")
-headers = divs.find_elements(By.TAG_NAME, "h2")
-uls = divs.find_elements(By.TAG_NAME, "ul")
+def get_pt_books():
+    print("Buscando livros em português...")
+    url = "https://www.gutenberg.org/browse/languages/pt"
+    driver.get(url)
+    time.sleep(1)
 
-livros = []
-for h2, ul in zip(headers, uls):
-    lis = ul.find_elements(By.TAG_NAME, "li")
-    for li in lis:
-        if not "English" in li.text:
-            a = li.find_element(By.TAG_NAME, "a")
-            codigo = a.get_attribute('href').split("/")[-1]
-            link = f"https://www.gutenberg.org/files/{codigo}"
-            livros.append(link)
+    div = driver.find_element(By.CLASS_NAME, "pgdbbylanguage")
+    uls = div.find_elements(By.TAG_NAME, "ul")
 
-i = 0
-BOOKS = {}
-for livro in livros:
+    book_links = []
+    for ul in uls:
+        lis = ul.find_elements(By.TAG_NAME, "li")
+        for li in lis:
+            if "English" not in li.text:
+                try:
+                    a = li.find_element(By.TAG_NAME, "a")
+                    codigo = a.get_attribute("href").split("/")[-1]
+                    book_links.append(f"https://www.gutenberg.org/files/{codigo}/{codigo}-0.txt")
+                except:
+                    continue
+
+    print(f"{len(book_links)} livros encontrados.")
+    random.shuffle(book_links)
+    return book_links
+
+
+def download_file(url, filename, total_downloaded):
+    output_path = os.path.join(OUTPUT_DIR, f"{filename}.txt")
     try:
-        driver.get(livro)
+        response = requests.get(url, stream=True, timeout=15)
+        response.raise_for_status()
+        total_size = int(response.headers.get("content-length", 0))
+        downloaded = 0
+        progress_bar = tqdm(total=total_size, unit="B", unit_scale=True, desc=f"Baixando {filename}")
+
+        with open(output_path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                if not chunk:
+                    continue
+
+                if total_downloaded + len(chunk) > MAX_BYTES:
+                    remaining = MAX_BYTES - total_downloaded
+                    f.write(chunk[:remaining])
+                    total_downloaded += remaining
+                    progress_bar.update(remaining)
+                    progress_bar.close()
+                    print(f"\n⚠️ Limite de {MAX_MB} MB atingido durante {filename}. Interrompendo downloads.")
+                    return total_downloaded, True, False
+
+                f.write(chunk)
+                downloaded += len(chunk)
+                total_downloaded += len(chunk)
+                progress_bar.update(len(chunk))
+
+        progress_bar.close()
+        print(f"{filename} baixado ({downloaded / 1024 / 1024:.2f} MB)")
+        return total_downloaded, False, True
+
+    except requests.exceptions.RequestException as e:
+        print(f"ERRO ao baixar {filename}: {e}")
+        return total_downloaded, False, False
+
+
+def download_books():
+    book_links = get_pt_books()
+    total_downloaded = 0
+    successful = 0
+    i = 1
+
+    for url in book_links:
+        if total_downloaded >= MAX_BYTES:
+            print(f"\n✅ Limite total atingido ({total_downloaded / 1024 / 1024:.2f} MB). Finalizando.")
+            break
+
+        total_downloaded, stop, success = download_file(url, f"livro_{i}", total_downloaded)
+        if success:
+            successful += 1
+        i += 1
+
+        if stop: break
         time.sleep(1)
 
-        anchors = driver.find_elements(By.TAG_NAME, "a")
-        for a in anchors:
-            text = a.text.strip()
-            href = a.get_attribute("href")
-            if text.endswith(".txt") or (href and href.endswith(".txt")):
-                BOOKS[str(i)] = href
-                print(f"📄Livro encontrado em texto: {href}")
-                i += 1
-                break
-    except Exception as e:
-        print(f"❌ Erro em {livro}: {e}")
-driver.quit()
-
-
-OUTPUT_DIR = "data/raw"
-
-def download_files():
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    total_bytes_downloaded = 0
-
-    for filename, url in BOOKS.items():
-        output_path = os.path.join(OUTPUT_DIR, f"livro_{filename}.txt")
-        
-        try:
-            response = requests.get(url, stream=True)
-            response.raise_for_status()
-
-            total_size = int(response.headers.get('content-length', 0))
-            downloaded = 0
-            progress_bar = tqdm(total=total_size, unit='B', unit_scale=True, desc=f"Baixando {filename}")
-            
-            with open(output_path, 'wb') as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:
-                        f.write(chunk)
-                        chunk_size = len(chunk)
-                        downloaded += chunk_size
-                        progress_bar.update(chunk_size)
-            
-            progress_bar.close()
-            total_bytes_downloaded += downloaded
-
-            if total_size != 0 and progress_bar.n != total_size:
-                print(f"⚠️ AVISO: O tamanho do download de {filename} não corresponde ao esperado.")
-            else:
-                print(f"✅ {filename} baixado ({downloaded / 1024 / 1024:.2f} MB)")
-
-        except requests.exceptions.RequestException as e:
-            print(f"❌ ERRO ao baixar {filename}: {e}")
-
-    print("\n📦 Download de todos os arquivos concluído!")
-    total_mb = total_bytes_downloaded / 1024 / 1024
-    if total_mb < 1024:
-        print(f"💾 Tamanho total baixado: {total_mb:.2f} MB")
-    else:
-        print(f"💾 Tamanho total baixado: {total_mb / 1024:.2f} GB")
+    print(f"Total de livros baixados com sucesso: {successful}")
+    print(f"Tamanho total baixado: {total_downloaded / 1024 / 1024:.2f} MB")
 
 
 if __name__ == "__main__":
-    download_files()
+    try:
+        download_books()
+    finally:
+        driver.quit()
