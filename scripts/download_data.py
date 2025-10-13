@@ -13,40 +13,13 @@ MAX_MB = int(sys.argv[1]) if len(sys.argv) > 1 else None
 MAX_BYTES = MAX_MB * 1024 * 1024 if MAX_MB else float('inf')
 OUTPUT_DIR = "data/raw"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-print(f"Limite definido: {MAX_MB} MB\n")
-
+print(f"Limite definido: {MAX_MB if MAX_MB else 'sem limite'} MB\n")
 
 chrome_options = Options()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 driver = webdriver.Chrome(options=chrome_options)
-
-
-def get_pt_books():
-    print("Buscando livros em português...")
-    url = "https://www.gutenberg.org/browse/languages/pt"
-    driver.get(url)
-    time.sleep(1)
-
-    div = driver.find_element(By.CLASS_NAME, "pgdbbylanguage")
-    uls = div.find_elements(By.TAG_NAME, "ul")
-
-    book_links = []
-    for ul in uls:
-        lis = ul.find_elements(By.TAG_NAME, "li")
-        for li in lis:
-            if "English" not in li.text:
-                try:
-                    a = li.find_element(By.TAG_NAME, "a")
-                    codigo = a.get_attribute("href").split("/")[-1]
-                    book_links.append(f"https://www.gutenberg.org/files/{codigo}/{codigo}-0.txt")
-                except:
-                    continue
-
-    print(f"{len(book_links)} livros encontrados.")
-    random.shuffle(book_links)
-    return book_links
 
 
 def download_file(url, filename, total_downloaded):
@@ -63,13 +36,14 @@ def download_file(url, filename, total_downloaded):
                 if not chunk:
                     continue
 
-                if total_downloaded + len(chunk) > MAX_BYTES:
+                if MAX_MB is not None and total_downloaded + len(chunk) > MAX_BYTES:
                     remaining = MAX_BYTES - total_downloaded
-                    f.write(chunk[:remaining])
-                    total_downloaded += remaining
-                    progress_bar.update(remaining)
+                    if remaining > 0:
+                        f.write(chunk[:remaining])
+                        progress_bar.update(remaining)
+                        total_downloaded += remaining
                     progress_bar.close()
-                    print(f"\n⚠️ Limite de {MAX_MB} MB atingido durante {filename}. Interrompendo downloads.")
+                    print(f"\nLimite de {MAX_MB} MB atingido durante {filename}. Interrompendo downloads.")
                     return total_downloaded, True, False
 
                 f.write(chunk)
@@ -78,7 +52,7 @@ def download_file(url, filename, total_downloaded):
                 progress_bar.update(len(chunk))
 
         progress_bar.close()
-        print(f"{filename} baixado ({downloaded / 1024 / 1024:.2f} MB)")
+        print(f"Livro de código ´{filename}´ baixado ({downloaded / 1024 / 1024:.2f} MB)")
         return total_downloaded, False, True
 
     except requests.exceptions.RequestException as e:
@@ -86,24 +60,58 @@ def download_file(url, filename, total_downloaded):
         return total_downloaded, False, False
 
 
-def download_books():
-    book_links = get_pt_books()
+def get_pt_books():
+    print("Buscando livros em português...")
+    url = "https://www.gutenberg.org/browse/languages/pt"
+    driver.get(url)
+    time.sleep(2)
+
+    div = driver.find_element(By.CLASS_NAME, "pgdbbylanguage")
+    uls = div.find_elements(By.TAG_NAME, "ul")
+
+    base_links = []
+    for ul in uls:
+        lis = ul.find_elements(By.TAG_NAME, "li")
+        for li in lis:
+            if "English" not in li.text:
+                try:
+                    a = li.find_element(By.TAG_NAME, "a")
+                    href = a.get_attribute("href")
+                    if href and href.startswith("https://www.gutenberg.org/ebooks/"):
+                        base_links.append(href)
+                except Exception:
+                    continue
+
+    print(f"{len(base_links)} links base coletados.\n")
+    random.shuffle(base_links)
+
     total_downloaded = 0
     successful = 0
-    i = 1
+    count = 0
 
-    for url in book_links:
-        if total_downloaded >= MAX_BYTES:
-            print(f"\n✅ Limite total atingido ({total_downloaded / 1024 / 1024:.2f} MB). Finalizando.")
-            break
+    for link in base_links:
+        codigo = link.split("/")[-1]
+        url_livro = f"https://www.gutenberg.org/files/{codigo}"
+        try:
+            driver.get(url_livro)
+            anchors = driver.find_elements(By.TAG_NAME, "a")
+            for a in anchors:
+                href = a.get_attribute("href")
+                if href and href.endswith(".txt"):
+                    print(f"Livro encontrado: {href}")
+                    total_downloaded, stop, success = download_file(href, codigo, total_downloaded)
+                    if success:
+                        successful += 1
+                    if stop:
+                        print("Encerrando processo por atingir o limite definido.")
+                        print(f"Total de livros baixados com sucesso: {successful}")
+                        print(f"Tamanho total baixado: {total_downloaded / 1024 / 1024:.2f} MB")
+                        return
+                    break
+        except Exception as e:
+            print(f"Erro em {url_livro}: {e}")
 
-        total_downloaded, stop, success = download_file(url, f"livro_{i}", total_downloaded)
-        if success:
-            successful += 1
-        i += 1
-
-        if stop: break
-        time.sleep(1)
+        count += 1
 
     print(f"Total de livros baixados com sucesso: {successful}")
     print(f"Tamanho total baixado: {total_downloaded / 1024 / 1024:.2f} MB")
@@ -111,6 +119,6 @@ def download_books():
 
 if __name__ == "__main__":
     try:
-        download_books()
+        get_pt_books()
     finally:
         driver.quit()
