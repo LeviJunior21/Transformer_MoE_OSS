@@ -110,7 +110,7 @@ def get_pt_books():
         except Exception as e:
             print(f"Erro em {url_livro}: {e}")
 
-    print(f"Total de livros baixados com sucesso: {successful}")
+    print(f"Todos os livros disponíveis foram baixados com sucesso: {successful}")
     print(f"Tamanho total baixado: {total_downloaded / 1024 / 1024:.2f} MB")
 
 
