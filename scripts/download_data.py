@@ -13,6 +13,7 @@ MAX_MB = int(sys.argv[1]) if len(sys.argv) > 1 else None
 SEED = int(sys.argv[2]) if len(sys.argv) > 2 else 123
 random.seed(SEED)
 
+
 MAX_BYTES = MAX_MB * 1024 * 1024 if MAX_MB else float('inf')
 OUTPUT_DIR = "data/raw"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
