@@ -25,7 +25,7 @@ def train_model(model, optimizer, config, train_loader, val_loader, device):
     start_time = time.time()
     train_losses, val_loss, tokens_seen, total_train_time = train_model_aux(
         model, train_loader, val_loader, optimizer, device,
-        num_epochs=num_epochs, eval_freq=5, eval_iter=5,
+        num_epochs=num_epochs, eval_freq=config["eval_freq"], eval_iter=config["eval_iter"],
         start_context=config["start_context"], tokenizer=tokenizer,
         wandb_run=run, save_freq_wdb=config["save_freq_wdb"], file_name=config["file_name"],
         save_wdb=config["save_wdb"], state_dict=state_dict,

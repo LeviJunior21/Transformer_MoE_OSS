@@ -54,7 +54,7 @@ def print_loader_info(title, loader, init=False):
     print(f"\tNúmero de amostras por batch: {loader.batch_size}")
 
 
-def get_loaders(data_path, tokenizer, max_length = 256, batch_sz = 10, num_workers = 4):
+def get_loaders(data_path, tokenizer, max_length = 256, batch_sz = 10, num_workers = 4, stride=1):
     train_data = load_file(os.path.join(data_path, "train.txt"))
     test_data = load_file(os.path.join(data_path, "test.txt"))
     val_data = load_file(os.path.join(data_path, "val.txt"))
@@ -62,7 +62,7 @@ def get_loaders(data_path, tokenizer, max_length = 256, batch_sz = 10, num_worke
     train_loader = create_dataset(
         text=train_data,
         max_length=max_length,
-        stride=1,
+        stride=stride,
         batch_size=batch_sz,
         num_workers=num_workers,
         tokenizer=tokenizer,
@@ -74,7 +74,7 @@ def get_loaders(data_path, tokenizer, max_length = 256, batch_sz = 10, num_worke
     test_loader = create_dataset(
         text=test_data,
         max_length=max_length,
-        stride=1,
+        stride=stride,
         batch_size=batch_sz,
         num_workers=num_workers,
         tokenizer=tokenizer,
@@ -86,7 +86,7 @@ def get_loaders(data_path, tokenizer, max_length = 256, batch_sz = 10, num_worke
     val_loader = create_dataset(
         text=val_data,
         max_length=max_length,
-        stride=1,
+        stride=stride,
         batch_size=batch_sz,
         num_workers=num_workers,
         tokenizer=tokenizer,
