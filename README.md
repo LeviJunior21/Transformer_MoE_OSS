@@ -1,5 +1,5 @@
-# 🧠 GPT2 - GQA: Geração de Texto com Arquitetura Customizada
-Este projeto tem como objetivo treinar um modelo de linguagem baseado no **GPT-2** para geração de texto em português, utilizando obras de **Machado de Assis** como corpus principal. A arquitetura foi adaptada para tarefas de geração com avaliação qualitativa e checkpoints salvos ao longo do treinamento.
+# 🧠 Transformer: Geração de Texto com Arquitetura Grouped Query Attention e Mixture of Experts
+Este projeto tem como objetivo treinar um modelo de linguagem baseado no **Decoder-only** para geração de texto em português, utilizando como corpus em português. A arquitetura foi adaptada para tarefas de geração com avaliação qualitativa e checkpoints salvos ao longo do treinamento.
 
 ## 📁 Estrutura do projeto
 
@@ -36,6 +36,7 @@ Instale os pacotes necessários com:
 pip install -r requirements.txt
 ```
 **Principais bibliotecas:**
+- **selenium** - Raspagem de livros em portuguê
 - **torch** – Treinamento do modelo
 - **tiktoken** – Tokenização eficiente
 - **requests, tqdm** – Download e progresso
