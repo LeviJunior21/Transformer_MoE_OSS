@@ -41,7 +41,7 @@ pip install -r requirements.txt
 - **tiktoken** – Tokenização eficiente
 - **requests, tqdm** – Download e progresso
 - **transformers** – Baseado em Decoder-only
-- **wandb** - Salvamenro dos pesos do modelo
+- **wandb** - Salvamento dos pesos do modelo
 
 ## 📚 Dados
 Os textos foram extraídos do [Projeto Gutenberg](https://www.gutenberg.org/) e processados para remover metadados, normalizar pontuação e dividir em parágrafos com tamanho mínimo.
