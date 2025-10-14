@@ -1,4 +1,4 @@
-# 🧠 Transformer: Geração de Texto com Arquitetura Grouped Query Attention e Mixture of Experts
+# Transformer: Geração de Texto com Arquitetura Grouped Query Attention e Mixture of Experts
 Este projeto tem como objetivo treinar um modelo de linguagem baseado no **Decoder-only** para geração de texto em português, utilizando como corpus em português. A arquitetura foi adaptada para tarefas de geração com avaliação qualitativa e checkpoints salvos ao longo do treinamento.
 
 ## 📁 Estrutura do projeto
