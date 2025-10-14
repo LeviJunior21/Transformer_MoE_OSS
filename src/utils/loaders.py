@@ -47,7 +47,7 @@ def load_file(file_path):
 
 
 def print_loader_info(title, loader, init=False):
-    print(f"{'\n' if init else ''}- {title}:")
+    print(f"- {title}")
     print(f"\tTotal de amostras: {loader.dataset.__len__()}")
     print(f"\tTokens em cada amostra: {len(loader.dataset.__getitem__(0)[0])}")
     print(f"\tNúmero de batches: {len(loader)}")
