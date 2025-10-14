@@ -66,7 +66,12 @@ def clean_gutenberg_text(text):
 def save_split(data, path):
     with open(path, 'w', encoding='utf-8') as f:
         f.write(data)
-    print(f"Salvo {len(data.split())} palavras em: {path}")
+
+    size_bytes = os.path.getsize(path)
+    size_mb = size_bytes / (1024 * 1024)    
+    print(f"Salvo {len(data.split())} palavras ({size_mb:.2f} MB) em: {path}")
+    
+    return size_mb
 
 
 def main():
@@ -110,8 +115,6 @@ def main():
         return
     
     corpora = "\n\n".join(paragraphs_valid)
-    #corpora = re.sub(r'\.\s*\n', '.\n', corpora)
-    #corpora = re.sub(r'(?<!\.)\n', ' ', corpora)
     
     with open(CONSOLIDATED_TEXT_PATH, 'w', encoding='utf-8') as f:
         f.write(corpora)
@@ -126,11 +129,13 @@ def main():
     val_text = fix_line_breaks(corpora[train_end:test_end])
     test_text = fix_line_breaks(corpora[test_end:])
 
-    save_split(train_text, os.path.join(PROCESSED_DATA_DIR, "train.txt"))
-    save_split(val_text, os.path.join(PROCESSED_DATA_DIR, "val.txt"))
-    save_split(test_text, os.path.join(PROCESSED_DATA_DIR, "test.txt"))
+    total_size = save_split(train_text, os.path.join(PROCESSED_DATA_DIR, "train.txt"))
+    total_size += save_split(val_text, os.path.join(PROCESSED_DATA_DIR, "val.txt"))
+    total_size += save_split(test_text, os.path.join(PROCESSED_DATA_DIR, "test.txt"))
     
     print("\n--- Preparação de dados concluída com sucesso! ---")
+    print(f"O tamanho total dos arquivos processados é de {total_size:.2f} MB em '{PROCESSED_DATA_DIR}'.")
+
 
 if __name__ == "__main__":
     main()
