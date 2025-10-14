@@ -1,7 +1,6 @@
 import os
-import torch, tiktoken
+import torch
 from torch.utils.data import Dataset, DataLoader
-from tqdm import tqdm
 
 
 class Dataset_GPT(Dataset):
@@ -9,27 +8,21 @@ class Dataset_GPT(Dataset):
         self.input_ids = []
         self.target_ids = []
 
-        allowed_special = {'<|endoftext|>'}
+        allowed_special = { '<|endoftext|>' }
         tokens = tokenizer.encode(text, allowed_special=allowed_special)
 
-        self.tokens = torch.tensor(tokens, dtype=torch.long)
-        self.max_length = max_length
-        self.stride = stride
+        for i in range(0, len(tokens) - max_length, stride):
+            self.input_ids.append(torch.tensor(tokens[i: i + max_length]))
+            self.target_ids.append(torch.tensor(tokens[i+1: i+max_length + 1]))
 
     def __getitem__(self, idx):
-        start_idx = idx * self.stride
-        
-        input_ids = self.tokens[start_idx : start_idx + self.max_length]
-        target_ids = self.tokens[start_idx + 1 : start_idx + self.max_length + 1]
-        
-        return input_ids, target_ids
+        return self.input_ids[idx], self.target_ids[idx]
 
     def __len__(self):
-        return (len(self.tokens) - self.max_length - 1) // self.stride
+        return len(self.input_ids)
     
 
 def create_dataset(text, stride, max_length, shuffle, drop_last, tokenizer, num_workers, batch_size, set):
-
     dataset = Dataset_GPT(
         text=text,
         tokenizer=tokenizer,
@@ -46,10 +39,19 @@ def create_dataset(text, stride, max_length, shuffle, drop_last, tokenizer, num_
         num_workers=num_workers
     )
 
+
 def load_file(file_path):
     with open(file_path, 'r',encoding='utf-8') as file:
         content = file.read()
     return content
+
+
+def print_loader_info(title, loader, init=False):
+    print(f"{'\n' if init else ''}- {title}:")
+    print(f"\tTotal de amostras: {loader.dataset.__len__()}")
+    print(f"\tTokens em cada amostra: {len(loader.dataset.__getitem__(0)[0])}")
+    print(f"\tNúmero de batches: {len(loader)}")
+    print(f"\tNúmero de amostras por batch: {loader.batch_size}")
 
 
 def get_loaders(data_path, tokenizer, max_length = 256, batch_sz = 10):
@@ -92,5 +94,9 @@ def get_loaders(data_path, tokenizer, max_length = 256, batch_sz = 10):
         shuffle=True,
         set="VALIDAÇÃO"
     )
+    
+    print_loader_info("Treino", train_loader, init=False)
+    print_loader_info("Teste", test_loader, init=True)
+    print_loader_info("Validação", val_loader, init=True)
     
     return train_loader, test_loader, val_loader
