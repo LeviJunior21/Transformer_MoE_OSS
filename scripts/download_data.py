@@ -32,7 +32,7 @@ def download_file(url, filename, total_downloaded):
         response.raise_for_status()
         total_size = int(response.headers.get("content-length", 0))
         downloaded = 0
-        progress_bar = tqdm(total=total_size, unit="B", unit_scale=True, desc=f"Baixando {filename}")
+        progress_bar = tqdm(total=total_size, unit="B", unit_scale=True, desc=f"Baixando o livro de código '{filename}'")
 
         with open(output_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
