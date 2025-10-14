@@ -71,7 +71,10 @@ def save_split(data, path):
     size_mb = size_bytes / (1024 * 1024)    
     print(f"Salvo {len(data.split())} palavras ({size_mb:.2f} MB) em: {path}")
     
-    return size_mb
+    tamanho_bytes = len(data.encode("utf-8"))
+    tamanho_mb = tamanho_bytes / (1024 * 1024)
+    print(f"Tamanho: {tamanho_bytes} bytes (~{tamanho_mb:.4f} MB)")
+    return tamanho_bytes
 
 
 def main():
