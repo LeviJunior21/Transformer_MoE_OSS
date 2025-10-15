@@ -14,6 +14,9 @@ class Dataset_GPT(Dataset):
         for i in range(0, len(tokens) - max_length, stride):
             self.input_ids.append(torch.tensor(tokens[i: i + max_length]))
             self.target_ids.append(torch.tensor(tokens[i+1: i+max_length + 1]))
+        
+        print(f"Dataset de {set} está pronto!")
+
 
     def __getitem__(self, idx):
         return self.input_ids[idx], self.target_ids[idx]
@@ -31,13 +34,16 @@ def create_dataset(text, stride, max_length, shuffle, drop_last, tokenizer, num_
         set=set
     )
 
-    return DataLoader(
+    dataloader = DataLoader(
         dataset=dataset,
         batch_size=batch_size,
         shuffle=shuffle,
         drop_last=drop_last,
         num_workers=num_workers
     )
+
+    print(f"Dataloader de {set} está pronto!")
+    return dataloader
 
 
 def load_file(file_path):
@@ -58,6 +64,8 @@ def get_loaders(data_path, tokenizer, max_length = 256, batch_sz = 10, num_worke
     train_data = load_file(os.path.join(data_path, "train.txt"))
     test_data = load_file(os.path.join(data_path, "test.txt"))
     val_data = load_file(os.path.join(data_path, "val.txt"))
+
+    print("Arquivos carregados!")
     
     train_loader = create_dataset(
         text=train_data,
