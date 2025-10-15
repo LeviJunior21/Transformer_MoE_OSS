@@ -65,7 +65,7 @@ def get_loaders(data_path, tokenizer, max_length = 256, batch_sz = 10, num_worke
     test_data = load_file(os.path.join(data_path, "test.txt"))
     val_data = load_file(os.path.join(data_path, "val.txt"))
 
-    print("Arquivos carregados!")
+    print("Arquivos carregados!\n")
     
     train_loader = create_dataset(
         text=train_data,
@@ -103,8 +103,10 @@ def get_loaders(data_path, tokenizer, max_length = 256, batch_sz = 10, num_worke
         set="VALIDAÇÃO"
     )
     
-    print_loader_info("Treino", train_loader, init=False)
-    print_loader_info("Teste", test_loader, init=True)
-    print_loader_info("Validação", val_loader, init=True)
+    print("\n")
+    print_loader_info("Treino", train_loader)
+    print_loader_info("Teste", test_loader)
+    print_loader_info("Validação", val_loader)
+    print("\n")
     
     return train_loader, test_loader, val_loader
