@@ -50,3 +50,4 @@ Os textos foram extraídos do [Projeto Gutenberg](https://www.gutenberg.org/) e 
 1. [GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints](https://arxiv.org/abs/2305.13245)
 2. [Language Models are Unsupervised Multitask Learners](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf)
 3. [Build a Large Language Model (From Scratch)](https://github.com/rasbt/LLMs-from-scratch)
+4. [OUTRAGEOUSLY LARGE NEURAL NETWORKS: THE SPARSELY-GATED MIXTURE-OF-EXPERTS LAYER (Arxiv)](https://arxiv.org/pdf/1701.06538)
