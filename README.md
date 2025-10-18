@@ -36,7 +36,7 @@ Instale os pacotes necessários com:
 pip install -r requirements.txt
 ```
 **Principais bibliotecas:**
-- **selenium** - Raspagem de livros em portuguê
+- **selenium** - Raspagem de livros em português
 - **torch** – Treinamento do modelo
 - **tiktoken** – Tokenização eficiente
 - **requests, tqdm** – Download e progresso
