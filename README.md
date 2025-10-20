@@ -23,7 +23,9 @@ deeplearning-final/
 O treinamento está sendo realizado em um notebook do Kaggle, aproveitando os recursos gratuitos de GPU. Para reproduzir:
 
 1. Acesse o notebook no Kaggle
-   - [Transformers](https://www.kaggle.com/code/levidelimapjunior/treinamentotransformers)
+   - [Kaggle do GPT-2](https://www.kaggle.com/code/levidelimapjunior/treinamento-transformers-gpt)
+   - [Kaggle do GPT-OSS](https://www.kaggle.com/code/levidelimapjunior/treinamento-transformers-oss)
+
 2. Execute as células na ordem para:
    - Baixar e limpar os dados
    - Inicializar o modelo
